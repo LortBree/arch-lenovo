@@ -17,7 +17,7 @@ Skrip ini mengasumsikan partisi berikut:
 |----------|--------|-------------|
 | /dev/sda1 | FAT32  | /boot       |
 | /dev/sda2 | swap   | swap        |
-| /dev/sda3 | ext4   | /           |
+| /dev/sda3 | ext4   | /root       |
 | /dev/sda4 | ext4   | /home       |
 
 ⚠️ **Semua partisi akan diformat ulang! Pastikan backup data Anda.**
