@@ -2,6 +2,7 @@
 
 # ==============================================================================
 # Skrip Instalasi Otomatis Arch Linux + Hyprland (Estetika Caelestia)
+# Versi: 1.1 (Debugged)
 #
 # Deskripsi:
 # Skrip ini mengotomatiskan penyiapan lingkungan desktop Hyprland yang lengkap
@@ -16,28 +17,7 @@
 # ==============================================================================
 
 # --- Konfigurasi Warna dan Fungsi Logging ---
-C_RESET='\033${C_RESET} $1"
-}
-
-success() {
-    echo -e "${C_GREEN}${C_RESET} $1"
-}
-
-warn() {
-    echo -e "${C_YELLOW}${C_RESET} $1"
-}
-
-error() {
-    echo -e "${C_RED}${C_RESET} $1"
-    exit 1
-}
-
-# --- Fase 0: Pra-Instalasi & Input Pengguna ---
-pre_flight_checks() {
-    info "Memulai pemeriksaan pra-instalasi..."
-
-    # Periksa hak akses root
-    if [[ $(id -u) -eq 0 ]]; then
+C_RESET='\033]; then
         error "Jangan menjalankan skrip ini sebagai root. Jalankan sebagai pengguna biasa dengan hak sudo."
     fi
 
@@ -61,7 +41,7 @@ get_user_input() {
     info "Instalasi akan dilakukan untuk pengguna: $username"
     
     # Meminta password hanya untuk konfirmasi sudo di awal
-    info "Meminta hak akses sudo..."
+    info "Meminta hak akses sudo untuk melanjutkan instalasi..."
     sudo -v
     if [[ $? -ne 0 ]]; then
         error "Gagal mendapatkan hak sudo. Pastikan pengguna '$username' ada di grup wheel."
@@ -282,8 +262,9 @@ setup_services() {
 
     # Konfigurasi SDDM dengan tema Silent
     info "Mengkonfigurasi SDDM..."
-    sudo mkdir -p /etc/sddm.conf.d
-    sudo tee /etc/sddm.conf.d/theme.conf > /dev/null <<EOF
+    local sddm_conf_file="/etc/sddm.conf.d/theme.conf"
+    sudo mkdir -p "$(dirname "$sddm_conf_file")"
+    sudo tee "$sddm_conf_file" > /dev/null <<EOF
 
 Current=silent
 
@@ -310,8 +291,10 @@ main() {
     configure_system
     setup_services
 
-    success "Instalasi selesai! Silakan reboot sistem Anda untuk memulai sesi Hyprland baru."
+    success "=================================================================="
+    success "Instalasi Selesai! Silakan REBOOT sistem Anda sekarang."
     info "Setelah reboot, Anda akan disambut oleh layar login SDDM. Masuk dengan kredensial Anda."
+    success "=================================================================="
 }
 
 # --- Jalankan Skrip ---
