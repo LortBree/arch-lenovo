@@ -15,11 +15,26 @@
 # ==============================================================================
 
 # --- Konfigurasi Warna dan Fungsi Logging ---
-C_RESET='\033]; then
+C_RESET='\033[0m' # FIX: Corrected the ANSI escape code.
+C_RED='\033[0;31m'
+C_GREEN='\033[0;32m'
+C_BLUE='\033[0;34m'
+C_YELLOW='\033[0;33m'
+
+info() { echo -e "${C_BLUE}[INFO]${C_RESET} $1"; }
+success() { echo -e "${C_GREEN}[SUCCESS]${C_RESET} $1"; }
+warn() { echo -e "${C_YELLOW}[WARNING]${C_RESET} $1"; }
+error() { echo -e "${C_RED}[ERROR]${C_RESET} $1"; exit 1; }
+
+# --- Fase 0: Pemeriksaan Pra-Instalasi ---
+pre_flight_checks() {
+    info "Memulai pemeriksaan pra-instalasi..."
+
+    if [[ $(id -u) -eq 0 ]]; then
         error "Jangan menjalankan skrip ini sebagai root. Jalankan sebagai pengguna biasa dengan hak sudo."
     fi
 
-    if! ping -c 1 -W 1 archlinux.org &> /dev/null; then
+    if ! ping -c 1 -W 1 archlinux.org &> /dev/null; then
         error "Tidak ada koneksi internet. Harap sambungkan dan coba lagi."
     fi
     
@@ -46,7 +61,7 @@ get_user_input() {
 # --- Fase 1: Instalasi Yay (AUR Helper) ---
 install_yay() {
     info "Memeriksa dan menginstal pembantu AUR (yay)..."
-    if! command -v yay &> /dev/null; then
+    if ! command -v yay &> /dev/null; then
         info "yay tidak ditemukan. Menginstal..."
         sudo pacman -S --needed --noconfirm git base-devel
         git clone https://aur.archlinux.org/yay.git /tmp/yay
@@ -83,14 +98,10 @@ install_packages() {
     )
 
     info "Menginstal paket dari repositori resmi..."
-    sudo pacman -S --needed --noconfirm "${pacman_packages[@]}" |
-
-| error "Gagal menginstal paket dari repositori resmi."
+    sudo pacman -S --needed --noconfirm "${pacman_packages[@]}" || error "Gagal menginstal paket dari repositori resmi." # FIX: Used || for error handling
 
     info "Menginstal paket dari AUR..."
-    yay -S --needed --noconfirm "${aur_packages[@]}" |
-
-| error "Gagal menginstal paket dari AUR."
+    yay -S --needed --noconfirm "${aur_packages[@]}" || error "Gagal menginstal paket dari AUR." # FIX: Used || for error handling
 
     success "Semua paket dependensi berhasil diinstal."
 }
@@ -337,9 +348,7 @@ EOF
     # Membuat direktori Pictures jika belum ada dan mengunduh wallpaper default
     mkdir -p "$HOME/Pictures"
     info "Mengunduh wallpaper default..."
-    curl -sL -o "$HOME/Pictures/wall.png" "https://w.wallhaven.cc/full/j3/wallhaven-j3m8y5.png" |
-
-| warn "Gagal mengunduh wallpaper. Silakan atur secara manual."
+    curl -sL -o "$HOME/Pictures/wall.png" "https://w.wallhaven.cc/full/j3/wallhaven-j3m8y5.png" || warn "Gagal mengunduh wallpaper. Silakan atur secara manual." # FIX: Used || for error handling
 
     success "Semua file konfigurasi berhasil dibuat."
 }
@@ -357,7 +366,7 @@ setup_services() {
     local sddm_conf_file="/etc/sddm.conf.d/theme.conf"
     sudo mkdir -p "$(dirname "$sddm_conf_file")"
     sudo tee "$sddm_conf_file" > /dev/null <<EOF
-
+[Theme]
 Current=silent
 
 [General]
