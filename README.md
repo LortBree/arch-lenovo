@@ -31,7 +31,7 @@ Skrip ini mengasumsikan partisi berikut:
    ```bash
    ping archlinux.org
 3. Jalankan perintah berikut:
-```bash
-curl -O https://raw.githubusercontent.com/LortBree/arch-autoinstall-caelestia/main/arch-caelestia-install.sh
-chmod +x arch-caelestia-install.sh
-./arch-caelestia-install.sh
+   ```bash
+   curl -O https://raw.githubusercontent.com/LortBree/arch-autoinstall-caelestia/main/arch-caelestia-install.sh
+   chmod +x arch-caelestia-install.sh
+   ./arch-caelestia-install.sh
