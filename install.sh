@@ -15,7 +15,7 @@
 # - Diperlukan koneksi internet.
 # ==============================================================================
 
-# --- Konfigurasi Warna untuk Output ---
+# --- Konfigurasi Warna dan Fungsi Logging ---
 C_RESET='\033${C_RESET} $1"
 }
 
@@ -37,7 +37,7 @@ pre_flight_checks() {
     info "Memulai pemeriksaan pra-instalasi..."
 
     # Periksa hak akses root
-    if]; then
+    if [[ $(id -u) -eq 0 ]]; then
         error "Jangan menjalankan skrip ini sebagai root. Jalankan sebagai pengguna biasa dengan hak sudo."
     fi
 
@@ -57,10 +57,11 @@ get_user_input() {
     fi
 
     # Pengguna saat ini akan menjadi pengguna utama
-    username=$(whoami)
+    local username=$(whoami)
     info "Instalasi akan dilakukan untuk pengguna: $username"
     
     # Meminta password hanya untuk konfirmasi sudo di awal
+    info "Meminta hak akses sudo..."
     sudo -v
     if [[ $? -ne 0 ]]; then
         error "Gagal mendapatkan hak sudo. Pastikan pengguna '$username' ada di grup wheel."
@@ -267,7 +268,7 @@ EOF
     # Modifikasi hyprland.conf untuk meluncurkan Waybar
     info "Memodifikasi hyprland.conf untuk meluncurkan Waybar..."
     local hypr_config="$HOME/.config/hypr/hyprland.conf"
-    # Hapus baris yang menjalankan shell Caelestia
+    # Hapus baris yang menjalankan shell Caelestia jika ada
     sed -i '/exec-once = caelestia-shell/d' "$hypr_config"
     # Tambahkan baris untuk menjalankan Waybar
     echo -e "\n# Jalankan Waybar\nexec-once = waybar" >> "$hypr_config"
@@ -285,6 +286,7 @@ setup_services() {
     sudo tee /etc/sddm.conf.d/theme.conf > /dev/null <<EOF
 
 Current=silent
+
 [General]
 InputMethod=qtvirtualkeyboard
 GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
