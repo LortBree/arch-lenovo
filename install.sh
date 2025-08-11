@@ -70,6 +70,10 @@ create_user_and_system() {
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
     info "Hak sudo untuk grup 'wheel' telah diaktifkan."
 
+    # Izinkan pacman tanpa password untuk grup wheel selama instalasi
+    info "Memberikan izin pacman tanpa password sementara..."
+    echo '%wheel ALL=(ALL) NOPASSWD: /usr/bin/pacman' > /etc/sudoers.d/10-installer
+
     # Atur hostname
     hostnamectl set-hostname "$hostname"
     info "Hostname diatur ke '$hostname'."
@@ -81,7 +85,7 @@ install_system_packages() {
     
     local pacman_packages=(
         # Prasyarat untuk yay & development
-        git base-devel
+        git base-devel go
         # Inti Hyprland & Wayland
         hyprland wayland xdg-desktop-portal-hyprland wireplumber pipewire-pulse polkit-kde-agent
         # Tampilan & Tema
@@ -395,6 +399,10 @@ main() {
     setup_user_environment
     setup_system_services
 
+    # Bersihkan aturan sudo sementara
+    info "Memberikan izin sudo sementara..."
+    rm /etc/sudoers.d/10-intstaller
+    
     success "=================================================================="
     success "Instalasi Selesai! Silakan REBOOT sistem Anda sekarang."
     info "Setelah reboot, login sebagai pengguna '$username' di layar SDDM."
