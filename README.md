@@ -1,6 +1,5 @@
 # Panduan Instalasi Arch Linux + Hyprland dengan Dotfiles Caelestia
 
-![screenshot-final](https://raw.githubusercontent.com/caelestia-dots/caelestia/main/assets/showcase.png)
 *<p align="center">Tampilan Desktop dengan Konfigurasi Caelestia</p>*
 
 ## Deskripsi
