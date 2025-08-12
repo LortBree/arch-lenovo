@@ -1,60 +1,40 @@
-# Skrip Instalasi Hyprland Mandiri (Catppuccin Themed)
+# Panduan Instalasi Arch Linux + Hyprland dengan Dotfiles Caelestia
 
-*<p align="center">Tampilan Desktop Hyprland dengan Tema Catppuccin Mocha</p>*
+![screenshot-final](https://raw.githubusercontent.com/caelestia-dots/caelestia/main/assets/showcase.png)
+*<p align="center">Tampilan Desktop dengan Konfigurasi Caelestia</p>*
 
 ## Deskripsi
-Skrip ini bertujuan untuk mengotomatiskan penyiapan lingkungan desktop Hyprland yang lengkap, stabil, dan mandiri di atas instalasi Arch Linux yang baru. Semua file konfigurasi dibuat secara lokal untuk memastikan keandalan dan konsistensi. Estetika terinspirasi dari desain modern dengan palet warna Catppuccin yang nyaman di mata.
+Dokumentasi ini merinci proses instalasi untuk membangun lingkungan desktop Hyprland di Arch Linux. Proses ini menggunakan pendekatan dua tahap:
 
-Skrip ini dirancang untuk dijalankan sebagai **root** pada instalasi Arch yang baru (di dalam `chroot`).
-
----
-
-## Fitur & Komponen Utama
-
-| Kategori | Komponen |
-| :--- | :--- |
-| **Window Manager** | Hyprland (Wayland Compositor) |
-| **Panel Status** | Waybar |
-| **App Launcher** | Wofi |
-| **Terminal** | Alacritty |
-| **Notifikasi** | Mako |
-| **File Manager** | Thunar |
-| **Tema** | Catppuccin Mocha, Papirus Icons, Adwaita GTK |
-| **Login Manager** | SDDM dengan tema minimalis |
-| **Screenshot Tool**| Grim + Slurp + Swappy |
-| **AUR Helper** | Yay |
-
----
+1.  **Instalasi Fondasi**: Menggunakan skrip eksternal untuk mengotomatiskan instalasi sistem dasar, termasuk Hyprland, user baru, dan `yay`.
+2.  **Implementasi Konfigurasi**: Mengganti konfigurasi dasar dengan dotfiles dari Caelestia untuk mendapatkan fungsionalitas dan estetika yang spesifik.
 
 ## Prasyarat
-Sebelum memulai, pastikan Anda memiliki:
-- Instalasi Arch Linux yang baru dan bersih.
-- Koneksi internet yang aktif.
-- Sistem sudah di-boot dalam mode **UEFI**. Panduan ini spesifik untuk UEFI.
-- Media Instalasi (Live USB) Arch Linux siap sedia.
+- Sistem operasi Arch Linux akan diinstal dari awal.
+- Koneksi internet aktif.
+- Sistem menggunakan mode boot **UEFI**.
+- Media instalasi (Live USB) Arch Linux tersedia.
 
 ---
 
-## Langkah-Langkah Instalasi
-
-Proses instalasi dibagi menjadi dua tahap: **Instalasi Sistem Dasar (Manual)** dan **Instalasi Desktop (Otomatis dengan Skrip)**.
+## Prosedur Instalasi
 
 ### Tahap 1: Persiapan Sistem Dasar (Manual)
 
-Langkah-langkah ini dilakukan dari dalam Live USB Arch.
+Tahapan ini dilakukan dari Live USB Arch untuk membangun sistem operasi dasar.
 
-1.  **Koneksi Internet**
-    Pastikan Anda terhubung ke internet (`ping archlinux.org`).
+1.  **Verifikasi Koneksi Internet**
+    Gunakan `ping archlinux.org` untuk memastikan konektivitas.
 
 2.  **Partisi Disk**
-    Gunakan `cfdisk` atau `fdisk` untuk membuat partisi. Skema yang direkomendasikan:
+    Gunakan `cfdisk`. Skema partisi yang direkomendasikan:
     - **Partisi 1**: `512M` - Tipe: `EFI System`
-    - **Partisi 2**: (Ukuran RAM Anda, misal `8G`) - Tipe: `Linux swap`
-    - **Partisi 3**: (Sisa ruang, misal `100G` atau lebih) - Tipe: `Linux filesystem`
+    - **Partisi 2**: (Ukuran RAM, misal `8G`) - Tipe: `Linux swap`
+    - **Partisi 3**: (Sisa ruang) - Tipe: `Linux filesystem`
 
 3.  **Format dan Mount Partisi**
     ```bash
-    # Ganti sdXn sesuai dengan nama partisi Anda
+    # Ganti sda dengan nama disk yang sesuai (misal: nvme0n1)
     mkfs.fat -F 32 /dev/sda1
     mkswap /dev/sda2
     mkfs.ext4 /dev/sda3
@@ -69,28 +49,24 @@ Langkah-langkah ini dilakukan dari dalam Live USB Arch.
     pacstrap -K /mnt base linux linux-firmware networkmanager nano sudo git
     ```
 
-5.  **Generate Fstab**
+5.  **Generate Fstab & Chroot**
     ```bash
     genfstab -U /mnt >> /mnt/etc/fstab
-    ```
-
-6.  **Chroot ke Sistem Baru**
-    ```bash
     arch-chroot /mnt
     ```
-    *Anda sekarang berada di dalam sistem baru Anda di hard disk.*
+    *Proses chroot selesai. Anda sekarang beroperasi di dalam sistem yang baru diinstal.*
 
-### Tahap 2: Instalasi Desktop (Otomatis dengan Skrip)
+### Tahap 2: Instalasi Fondasi Desktop (Otomatis)
 
-Langkah-langkah ini dilakukan **setelah `chroot`**.
+Setelah proses chroot, jalankan skrip instalasi untuk otomasi pembuatan user dan setup Hyprland dasar.
 
 1.  **Unduh Skrip Instalasi**
     ```bash
-    # Ganti dengan URL skrip Anda
-    curl -L -o /root/install.sh "URL_KE_FILE_SCRIPT_ANDA"
+    # Opsi -L diperlukan untuk mengikuti redirect dari GitHub
+    curl -L -o /root/install.sh "[https://raw.githubusercontent.com/LortBree/arch-lenovo/main/install.sh](https://raw.githubusercontent.com/LortBree/arch-lenovo/main/install.sh)"
     ```
 
-2.  **Beri Izin Eksekusi**
+2.  **Tetapkan Izin Eksekusi**
     ```bash
     chmod +x /root/install.sh
     ```
@@ -99,31 +75,68 @@ Langkah-langkah ini dilakukan **setelah `chroot`**.
     ```bash
     /root/install.sh
     ```
-    Skrip akan meminta input untuk username, password, dan hostname, lalu melanjutkan instalasi secara otomatis.
+    Skrip akan meminta input untuk username, password, dan hostname. Masukkan data yang diperlukan.
 
-### ❗ PENTING: Instalasi Bootloader (GRUB)
-
-Langkah ini **KRUSIAL** dan dilakukan **setelah skrip selesai** namun **sebelum Anda reboot**. Tanpa ini, sistem tidak akan bisa booting.
-
-1.  **Install Paket GRUB**
+4.  **Instal Bootloader dan Login Manager**
+    Setelah eksekusi skrip selesai, instalasi bootloader dan login manager diperlukan sebelum reboot.
     ```bash
-    pacman -S grub efibootmgr
-    ```
+    # Instal GRUB & SDDM (opsi --needed mencegah instalasi ulang)
+    pacman -S --needed grub efibootmgr sddm
 
-2.  **Pasang GRUB ke Disk**
-    ```bash
+    # Pasang GRUB ke disk
     grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ARCH
-    ```
-
-3.  **Generate Konfigurasi GRUB**
-    ```bash
     grub-mkconfig -o /boot/grub/grub.cfg
+
+    # Aktifkan layanan Login Manager
+    systemctl enable sddm
+    ```
+5.  **Reboot Sistem**
+    ```bash
+    exit        # Keluar dari chroot
+    umount -R /mnt
+    reboot      # Lepaskan Live USB
+    ```
+    Setelah reboot, sistem akan masuk ke sesi Hyprland dasar.
+
+---
+
+### Tahap 3: Transformasi ke Dotfiles Caelestia
+
+Proses ini dilakukan dari dalam sesi Hyprland yang sudah berjalan. Buka terminal (`Super + T`) untuk melanjutkan.
+
+1.  **Instal Dependensi Caelestia**
+    Gunakan `yay` untuk menginstal meta-package. Perintah ini akan menarik semua paket dan font yang dibutuhkan secara otomatis.
+    ```bash
+    yay -S caelestia-meta
     ```
 
-### Langkah Terakhir
+2.  **Backup dan Pindahkan Konfigurasi Awal**
+    Konfigurasi yang ada harus dipindahkan untuk mencegah konflik dengan dotfiles baru.
+    ```bash
+    # Buat direktori backup
+    mkdir -p ~/config-backup-awal
 
-Setelah bootloader terpasang, Anda siap untuk reboot.
-```bash
-exit        # Keluar dari chroot
-umount -R /mnt
-reboot      # Cabut Live USB Anda!
+    # Pindahkan konfigurasi dari skrip awal ke direktori backup
+    mv ~/.config/hypr ~/.config/waybar ~/.config/wofi ~/.config/alacritty ~/.config/mako ~/config-backup-awal/
+    ```
+
+3.  **Clone dan Jalankan Skrip Caelestia**
+    Clone repositori ke direktori yang direkomendasikan dan jalankan skrip instalasinya.
+    ```bash
+    # Clone repositori
+    git clone [https://github.com/caelestia-dots/caelestia.git](https://github.com/caelestia-dots/caelestia.git) ~/.local/share/caelestia
+
+    # Pindah ke direktori repositori dan jalankan skrip install.fish
+    cd ~/.local/share/caelestia
+    chmod +x install.fish
+    ./install.fish
+    ```
+
+4.  **Finalisasi**
+    Setelah skrip selesai, logout dan login kembali dari SDDM untuk menerapkan semua perubahan.
+
+---
+## Informasi Tambahan
+- File konfigurasi utama sekarang berada di `~/.local/share/caelestia`. Modifikasi file di direktori ini untuk melakukan kustomisasi.
+- Untuk memperbarui dotfiles, masuk ke direktori `~/.local/share/caelestia` dan jalankan `git pull`.
+
