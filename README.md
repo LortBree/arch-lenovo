@@ -1,7 +1,5 @@
 # Panduan Instalasi Arch Linux + Hyprland dengan Dotfiles Caelestia
 
-*<p align="center">Tampilan Desktop dengan Konfigurasi Caelestia</p>*
-
 ## Deskripsi
 Dokumentasi ini merinci proses instalasi untuk membangun lingkungan desktop Hyprland di Arch Linux. Proses ini menggunakan pendekatan dua tahap:
 
