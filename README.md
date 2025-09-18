@@ -27,7 +27,8 @@ Tahapan ini dilakukan dari Live USB Arch untuk membangun sistem operasi dasar.
     Gunakan `cfdisk`. Skema partisi yang direkomendasikan:
     - **Partisi 1**: `512M` - Tipe: `EFI System`
     - **Partisi 2**: (Ukuran RAM, misal `8G`) - Tipe: `Linux swap`
-    - **Partisi 3**: (Sisa ruang) - Tipe: `Linux filesystem`
+    - **Partisi 3**: (Root - size bebas) - Tipe: `Linux filesystem`
+    - **Partisi 4**: (Home - Sisa ruang) - Tipe: `Linux filesystem`
 
 3.  **Format dan Mount Partisi**
     ```bash
@@ -35,15 +36,19 @@ Tahapan ini dilakukan dari Live USB Arch untuk membangun sistem operasi dasar.
     mkfs.fat -F 32 /dev/sda1
     mkswap /dev/sda2
     mkfs.ext4 /dev/sda3
-
+    mkfs.ext4 /dev/sda4
+    
     mount /dev/sda3 /mnt
     swapon /dev/sda2
     mount --mkdir /dev/sda1 /mnt/boot
+    mkdir -p /mnt/home
+    mount /dev/sda4 /mnt/home
+
     ```
 
 4.  **Instalasi Paket Dasar (`pacstrap`)**
     ```bash
-    pacstrap -K /mnt base linux linux-firmware networkmanager nano sudo git
+    pacstrap /mnt base linux linux-firmware networkmanager nano sudo git
     ```
 
 5.  **Generate Fstab & Chroot**
